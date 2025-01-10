@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Predictive Policing Project</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        /* Global reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #fff;
+            line-height: 1.6;
+            padding-top: 60px; /* Added space for sticky nav */
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-weight: 600;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: rgba(0, 0, 0, 0.8);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 15px 0;
+        }
+
+        nav ul {
+            list-style-type: none;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            align-items: center;
+        }
+
+        nav ul li {
+            display: inline-block;
+        }
+
+        nav ul li a {
+            color: #fff;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: color 0.3s ease;
+            padding: 8px;
+        }
+
+        nav ul li a:hover {
+            color: #ff7f50;
+        }
+
+        /* Header Section */
+        header {
+            padding: 100px 20px;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4)), url('https://images.rawpixel.com/image_1300/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvcm0zMDktYWV3LTAxM18xXzEuanBn.jpg') no-repeat center center/cover;
+
+            color: #fff;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        header p {
+            font-size: 1.5rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Section Styling */
+        section {
+            padding: 80px 20px;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        section p {
+            font-size: 1.2rem;
+            color: #ddd;
+        }
+
+        /* Results Section */
+        #results {
+            background-color: #444;
+            color: #fff;
+        }
+
+        #crime-map {
+            width: 100%;
+            height: 500px; /* Ensure it's large enough to be visible */
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-top: 30px;
+        }
+
+        /* Contact Section */
+        #contact {
+            background-color: #ff7f50;
+            padding: 60px 20px;
+            color: #fff;
+        }
+
+        #contact input,
+        #contact textarea {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        #contact button {
+            padding: 15px 30px;
+            background-color: #fff;
+            color: #ff7f50;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        #contact button:hover {
+            background-color: #ff8a5c;
+        }
+
+        /* Footer Section */
+        footer {
+            background-color: #222;
+            color: #bbb;
+            padding: 20px;
+            text-align: center;
+        }
+
+        footer p {
+            font-size: 1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            header h1 {
+                font-size: 2.5rem;
+            }
+
+            header p {
+                font-size: 1.2rem;
+            }
+
+            #crime-map {
+                height: 300px;
+            }
+        }
+        /* Crime Reporting Form Styling */
+#contact form {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 0 auto;
+    color: #333;
+}
+
+#contact form .form-group {
+    margin-bottom: 20px;
+}
+
+#contact form .form-group label {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+#contact form input,
+#contact form textarea {
+    width: 100%;
+    padding: 15px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+#contact form button {
+    padding: 15px 30px;
+    background-color: #ff7f50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s;
+}
+
+#contact form button:hover {
+    background-color: #ff8a5c;
+}
+
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#methodology">Methodology</a></li>
+            <li><a href="#results">Results</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Header Section -->
+    <header>
+        <h1>Predictive Policing Project</h1>
+        <p>Harnessing Data & AI to Improve Public Safety</p>
+    </header>
+
+    <!-- Results Section -->
+    <section id="results">
+        <h2>Results and Visualizations</h2>
+        <p>Here are the crime predictions based on our model. The following map displays crime hotspots in India:</p>
+        <!-- Map Container -->
+        <div id="crime-map"></div>
+    </section>
+    <!-- Crime Reporting Form Section -->
+<section id="contact">
+    <h2>Register a Complaint</h2>
+    <p>If you are a victim or witness a crime, you can register a complaint using the form below:</p>
+    <form action="#" method="POST">
+        <div class="form-group">
+            <label for="name">Your Name</label>
+            <input type="text" id="name" name="name" placeholder="Your Name" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Your Email</label>
+            <input type="email" id="email" name="email" placeholder="Your Email" required>
+        </div>
+        <div class="form-group">
+            <label for="city">City</label>
+            <input type="text" id="city" name="city" placeholder="City" required>
+        </div>
+        <div class="form-group">
+            <label for="crime-type">Crime Type</label>
+            <input type="text" id="crime-type" name="crime-type" placeholder="Crime Type" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Crime Description</label>
+            <textarea id="description" name="description" placeholder="Crime Description" rows="4" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="contact-number">Contact Number</label>
+            <input type="text" id="contact-number" name="contact-number" placeholder="Contact Number" required>
+        </div>
+        <button type="submit">Submit Complaint</button>
+    </form>
+</section>
+
+
+    <!-- Additional Section with Image -->
+    <section id="about">
+        <h2>About the Project</h2>
+        <p>This project aims to use predictive algorithms to anticipate crime hotspots in urban regions. By analyzing historical crime data, we can forecast areas with high probabilities of criminal activity.</p>
+        
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <h2>Contact Us</h2>
+        <p>Have any questions or want to learn more? Reach out to us using the form below:</p>
+        <form action="#" method="POST">
+            <input type="text" name="name" placeholder="Your Name" required>
+            <input type="email" name="email" placeholder="Your Email" required>
+            <textarea name="message" placeholder="Your Message" rows="4" required></textarea>
+            <button type="submit">Send Message</button>
+        </form>
+    </section>
+
+    <!-- Footer Section -->
+    <footer>
+        <p>&copy; 2025 Predictive Policing Project. All rights reserved.</p>
+        <p>By Manjeet Kumar , Harshit Saini</p>
+    </footer>
+
+    <!-- Leaflet.js for Map Visualization -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <!-- <script>
+        // Initialize the map and set default position to Delhi, India
+        const map = L.map('crime-map').setView([28.6139, 77.2090], 10); // Coordinates of Delhi
+
+        // Add the OpenStreetMap tile layer to the map
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Example crime hotspot markers for India with detailed information
+        L.marker([28.7041, 77.1025]).addTo(map)  // Delhi
+            .bindPopup("<b>Crime Hotspot</b><br>High probability of theft and street crimes. Crime frequency: Weekly.")
+            .openPopup();
+        
+        L.marker([19.0760, 72.8777]).addTo(map)  // Mumbai
+            .bindPopup("<b>Crime Hotspot</b><br>High probability of robbery and assault. Crime frequency: Monthly.")
+            .openPopup();
+        
+        L.marker([12.9716, 77.5946]).addTo(map)  // Bangalore
+            .bindPopup("<b>Crime Hotspot</b><br>High probability of vehicle theft and burglary. Crime frequency: Bi-weekly.")
+            .openPopup();
+
+        // Simulated AI-based prediction: Adding an example of predicted hotspots
+        function predictCrimeHotspots() {
+            // Mock prediction function for demonstration
+            let predictedHotspots = [
+                { lat: 28.7041, lon: 77.1025, crime: 'Theft', prediction: 'High' },
+                { lat: 19.0760, lon: 72.8777, crime: 'Robbery', prediction: 'Moderate' },
+                { lat: 12.9716, lon: 77.5946, crime: 'Burglary', prediction: 'High' }
+            ];
+
+            // Simulate adding these predicted crime hotspots to the map
+            predictedHotspots.forEach(hotspot => {
+                L.marker([hotspot.lat, hotspot.lon]).addTo(map)
+                    .bindPopup(`<b>Predicted Crime Hotspot</b><br>Crime: ${hotspot.crime}<br>Prediction: ${hotspot.prediction}<br>Crime frequency: high.`)
+                    .openPopup();
+            });
+        }
+
+        // Call the function to add predicted hotspots to the map
+        predictCrimeHotspots();
+    </script> -->
+    <script>
+        // Initialize the map only once
+        const map = L.map('crime-map').setView([28.6139, 77.2090], 10); // Coordinates of Delhi
+    
+        // Add the OpenStreetMap tile layer to the map
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+    
+        // Define red polygon style
+        const redZoneStyle = {
+            color: 'red',  // Red border color
+            weight: 2,  // Border thickness
+            opacity: 0.8,  // Border opacity
+            fillColor: '#f03',  // Red fill color
+            fillOpacity: 0.4  // Fill opacity (transparency)
+        };
+    
+        // Define Crime Hot Zones (Polygons)
+    
+        // Delhi - Approximate crime zone
+        const delhiZone = [
+            [28.7041, 77.1025], [28.7150, 77.1300], [28.7300, 77.1300], [28.7250, 77.1000], [28.7041, 77.1025]
+        ];
+    
+        // Mumbai - Approximate crime zone
+        const mumbaiZone = [
+            [19.0760, 72.8777], [19.0900, 72.9000], [19.0800, 72.9500], [19.0700, 72.9300], [19.0760, 72.8777]
+        ];
+    
+        // Bangalore - Approximate crime zone
+        const bangaloreZone = [
+            [12.9716, 77.5946], [12.9800, 77.6100], [12.9700, 77.6250], [12.9500, 77.6000], [12.9716, 77.5946]
+        ];
+    
+        // Patna (Bihar) - Approximate crime zone
+        const patnaZone = [
+            [25.5941, 85.1376], [25.6000, 85.1500], [25.5900, 85.1700], [25.5800, 85.1600], [25.5941, 85.1376]
+        ];
+    
+        // Jaipur - Approximate crime zone
+        const jaipurZone = [
+            [26.9124, 75.7873], [26.9200, 75.8000], [26.9100, 75.8100], [26.9000, 75.7950], [26.9124, 75.7873]
+        ];
+    
+        // Add the crime zones as red polygons to the map
+        L.polygon(delhiZone, redZoneStyle).addTo(map).bindPopup("<b>Crime Zone - Delhi</b><br>High probability of theft and street crimes. Crime frequency: Weekly.");
+        L.polygon(mumbaiZone, redZoneStyle).addTo(map).bindPopup("<b>Crime Zone - Mumbai</b><br>High probability of robbery and assault. Crime frequency: Monthly.");
+        L.polygon(bangaloreZone, redZoneStyle).addTo(map).bindPopup("<b>Crime Zone - Bangalore</b><br>High probability of vehicle theft and burglary. Crime frequency: Bi-weekly.");
+        L.polygon(patnaZone, redZoneStyle).addTo(map).bindPopup("<b>Crime Zone - Patna</b><br>High risk of organized crimes. Crime frequency: Monthly.");
+        L.polygon(jaipurZone, redZoneStyle).addTo(map).bindPopup("<b>Crime Zone - Jaipur</b><br>High risk of property crimes. Crime frequency: Monthly.");
+    </script>
+    
+    <script>
+        // Simulated AI-based prediction: Adding an example of predicted hotspots
+        function predictCrimeHotspots() {
+            // Mock prediction function for demonstration
+            let predictedHotspots = [
+                { lat: 28.7041, lon: 77.1025, crime: 'Theft', prediction: 'High' },      // Delhi
+                { lat: 19.0760, lon: 72.8777, crime: 'Robbery', prediction: 'Moderate' }, // Mumbai
+                { lat: 12.9716, lon: 77.5946, crime: 'Burglary', prediction: 'High' },    // Bangalore
+                { lat: 22.5726, lon: 88.3639, crime: 'Pickpocketing', prediction: 'Moderate' }, // Kolkata
+                { lat: 13.0827, lon: 80.2707, crime: 'Assault', prediction: 'High' }      // Chennai
+            ];
+    
+            // Simulate adding these predicted crime hotspots to the map
+            predictedHotspots.forEach(hotspot => {
+                L.marker([hotspot.lat, hotspot.lon]).addTo(map)
+                    .bindPopup(`<b>Predicted Crime Hotspot</b><br>Crime: ${hotspot.crime}<br>Prediction: ${hotspot.prediction}<br>Crime frequency: Bi-weekly.`)
+                    .openPopup();
+            });
+        }
+    
+        // Call the function to add predicted hotspots to the map
+        predictCrimeHotspots();
+    </script>
+    <script>
+        // Simulated AI-based prediction: Adding an example of predicted hotspots
+        function predictCrimeHotspots() {
+            // Mock prediction function for demonstration
+            let predictedHotspots = [
+                { lat: 28.7041, lon: 77.1025, crime: 'Theft', prediction: 'High' },      // Delhi
+                { lat: 19.0760, lon: 72.8777, crime: 'Robbery', prediction: 'Moderate' }, // Mumbai
+                { lat: 12.9716, lon: 77.5946, crime: 'Burglary', prediction: 'High' },    // Bangalore
+                { lat: 22.5726, lon: 88.3639, crime: 'Pickpocketing', prediction: 'Moderate' }, // Kolkata
+                { lat: 13.0827, lon: 80.2707, crime: 'Assault', prediction: 'High' },      // Chennai
+                { lat: 25.0968, lon: 85.3131, crime: 'Looting', prediction: 'High' },      // Bihar
+                { lat: 26.9124, lon: 75.7873, crime: 'RapeCase', prediction: 'Moderate' }  // Jaipur
+            ];
+    
+            // Simulate adding these predicted crime hotspots to the map
+            predictedHotspots.forEach(hotspot => {
+                L.marker([hotspot.lat, hotspot.lon]).addTo(map)
+                    .bindPopup(`<b>Predicted Crime Hotspot</b><br>Crime: ${hotspot.crime}<br>Prediction: ${hotspot.prediction}<br>Crime frequency: Bi-weekly.`)
+                    .openPopup();
+            });
+        }
+    
+        // Call the function to add predicted hotspots to the map
+        predictCrimeHotspots();
+    </script>
+    <script>
+        // Handle form submission
+        const form = document.querySelector('#contact form');
+    
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();  // Prevent the form from reloading the page
+    
+            const name = document.querySelector('#name').value;
+            const email = document.querySelector('#email').value;
+            const city = document.querySelector('#city').value;
+            const crimeType = document.querySelector('#crime-type').value;
+            const description = document.querySelector('#description').value;
+            const contactNumber = document.querySelector('#contact-number').value;
+    
+            // For demonstration purposes, just logging the form data to the console
+            console.log('Complaint Registered:', {
+                name, email, city, crimeType, description, contactNumber
+            });
+    
+            // Show a confirmation message
+            alert('Your complaint has been submitted successfully! Thank you for your input.');
+            
+            // Optionally, reset the form after submission
+            form.reset();
+        });
+    </script>
+    
+    
+    
+
+</body>
+
+</html>
